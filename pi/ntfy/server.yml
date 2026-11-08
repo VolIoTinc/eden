@@ -1,0 +1,22 @@
+# ntfy server config — /etc/ntfy/server.yml
+# Project-agnostic: Eden publishes eden/*, Serenity can use serenity/* later.
+# Phone subscribes over Tailscale: http://<pi-tailscale-ip>:8090/eden_alerts
+
+# Bind to all local interfaces; the Pi firewall + no WAN port-forward keeps this
+# LAN/Tailscale-only. Do NOT expose 8090 on wwan0.
+listen-http: ":8090"
+
+cache-file: /var/cache/ntfy/cache.db
+cache-duration: "72h"
+
+auth-file: /var/lib/ntfy/user.db
+# Deny by default — users are granted per-topic access by install.sh:
+#   ntfy user add --role=user eden        (publisher, used by edend + scripts)
+#   ntfy user add --role=user andy        (phone subscriber)
+#   ntfy access eden "eden_*" write-only
+#   ntfy access andy "eden_*" read-only
+auth-default-access: "deny-all"
+
+behind-proxy: false
+attachment-cache-dir: /var/cache/ntfy/attachments
+attachment-total-size-limit: "100M"

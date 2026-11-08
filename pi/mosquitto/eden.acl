@@ -1,0 +1,12 @@
+# ACL for Eden users. Everything scoped under eden/#.
+# ESP32 nodes: publish sensors/status/acks, subscribe to their commands.
+user eden-node
+topic write eden/+/status
+topic write eden/+/sensor/#
+topic write eden/+/telemetry
+topic write eden/+/ack/#
+topic read eden/+/cmd/#
+
+# edend daemon: full eden tree.
+user edend
+topic readwrite eden/#

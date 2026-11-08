@@ -1,0 +1,77 @@
+{
+  "title": "Eden — Grow Overview",
+  "uid": "eden-overview",
+  "timezone": "browser",
+  "refresh": "1m",
+  "time": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Soil moisture (%)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 16, "h": 9 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent", "min": 0, "max": 100,
+          "custom": { "drawStyle": "line", "lineWidth": 2, "spanNulls": 3600000 }
+        }
+      },
+      "targets": [
+        { "expr": "moisture_pct", "legendFormat": "{{node}}/{{sensor}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Nodes online",
+      "type": "stat",
+      "gridPos": { "x": 16, "y": 0, "w": 8, "h": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "OFFLINE", "color": "red" }, "1": { "text": "ONLINE", "color": "green" } } }
+          ]
+        }
+      },
+      "targets": [
+        { "expr": "node_online", "legendFormat": "{{node}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "WiFi RSSI (dBm)",
+      "type": "timeseries",
+      "gridPos": { "x": 16, "y": 4, "w": 8, "h": 5 },
+      "fieldConfig": { "defaults": { "unit": "dBm", "custom": { "drawStyle": "line" } } },
+      "targets": [
+        { "expr": "node_rssi_dbm", "legendFormat": "{{node}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Doses (mL, last 7d)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 9, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "mlitre",
+          "custom": { "drawStyle": "bars", "fillOpacity": 80 }
+        }
+      },
+      "targets": [
+        { "expr": "dose_ml", "legendFormat": "{{plant}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Node heap (bytes)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 9, "w": 12, "h": 8 },
+      "fieldConfig": { "defaults": { "unit": "bytes", "custom": { "drawStyle": "line" } } },
+      "targets": [
+        { "expr": "node_heap_bytes", "legendFormat": "{{node}}", "refId": "A" }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}

@@ -1,0 +1,25 @@
+[Unit]
+Description=VictoriaMetrics time-series DB (Eden)
+After=network.target
+
+[Service]
+User=victoriametrics
+Group=victoriametrics
+ExecStart=/opt/victoriametrics/victoria-metrics-prod \
+    -storageDataPath=/var/lib/victoriametrics \
+    -retentionPeriod=2y \
+    -httpListenAddr=127.0.0.1:8428 \
+    -memory.allowedBytes=256MiB \
+    -search.maxUniqueTimeseries=100000
+Restart=on-failure
+RestartSec=5
+MemoryMax=384M
+CPUWeight=50
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/victoriametrics
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

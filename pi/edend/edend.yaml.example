@@ -1,0 +1,25 @@
+# edend config — install to /etc/eden/edend.yaml
+mqtt:
+  host: 127.0.0.1
+  port: 1883
+  username: edend
+  password: CHANGE_ME
+
+victoriametrics:
+  write_url: http://127.0.0.1:8428/write
+  flush_interval_s: 10
+  flush_max_lines: 500
+  spool_dir: /var/lib/edend/spool
+  spool_max_mb: 64
+
+ntfy:
+  url: http://127.0.0.1:8090
+  topic: eden_alerts
+  username: eden
+  password: CHANGE_ME
+
+plants_file: /etc/eden/plants.yaml
+
+alerts:
+  node_offline_debounce_s: 120
+  dose_done_notify: false   # true = ping on every completed dose (chatty)

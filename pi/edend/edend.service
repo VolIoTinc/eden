@@ -1,0 +1,25 @@
+[Unit]
+Description=Eden orchestrator daemon
+After=network.target mosquitto.service victoriametrics.service
+Wants=mosquitto.service victoriametrics.service
+
+[Service]
+User=edend
+Group=edend
+ExecStart=/opt/edend/venv/bin/python -m edend
+Environment=EDEND_CONFIG=/etc/eden/edend.yaml
+Restart=on-failure
+RestartSec=10
+# If edend crash-loops, systemd gives up after 5 tries in 10 min; the loss of its
+# MQTT LWT is itself the alert signal on the dashboard.
+StartLimitIntervalSec=600
+StartLimitBurst=5
+MemoryMax=128M
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/edend
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

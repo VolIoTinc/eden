@@ -1,0 +1,8 @@
+[Unit]
+Description=Eden DB size threshold check
+
+[Service]
+Type=oneshot
+ExecStart=/opt/eden/check-db-size.sh
+User=edend
+Group=edend

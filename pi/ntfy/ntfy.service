@@ -1,0 +1,19 @@
+[Unit]
+Description=ntfy push notification server
+After=network.target
+
+[Service]
+User=ntfy
+Group=ntfy
+ExecStart=/opt/ntfy/ntfy serve --config /etc/ntfy/server.yml
+Restart=on-failure
+RestartSec=5
+MemoryMax=128M
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/cache/ntfy /var/lib/ntfy
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
