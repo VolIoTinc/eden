@@ -21,7 +21,9 @@ and salty water. So Jimothy gets a full environment profile, not just a moisture
 | ~2026-06 | Sprouted |
 | 2026-11-07 | Moved to soil (1:2 perlite/potting mix). Project started. |
 | 2026-11-07 | S2 Mini + BME688 + LTR390 + probe soldered and verified. Probe #1 wet_raw = 1346 (pre-divider). Room 21.5 °C / 46 % RH. |
-| 2026-11-07 | Probe #2 installed in soil (no divider yet): dry_raw 4095 (clipped), wet_raw 1478. Probe #1 wet 1346, spare. Both clip dry on the S2 ADC → resistor kit ordered for the divider. |
+| 2026-11-07 | Probe #2 installed in soil (no divider yet): dry_raw 4095 (clipped), wet_raw 1478. Probe #1 wet 1346, spare. Both clip dry on the S2 ADC *in air only*. |
+| 2026-11-07 | First watering (soaked in). Raw 2680 at watering → 3296 within 20 min, then flat ~3280 for 1.5 h = **field capacity**. Log: `data/2026-11-07-first-watering.csv`. IAQ 50→68 and eCO2 500→581 within minutes of watering (wet mix off-gassing). RH fell to 39.6 % by midnight. |
+| 2026-11-09 | Sensors + S2 moved into a printed rim saddle. Wiring verified. Soil 3394 (two days of dry-down). BME688 reads 26.0 °C vs 21.5 °C Saturday — suspect board heat in the saddle, under review. |
 
 Expect some transplant sulk (droop, a dropped leaf) for 1–3 weeks after repotting. That's
 normal. Don't respond by watering more.
@@ -55,7 +57,9 @@ The pin map in [`docs/wiring.md`](../../docs/wiring.md) is for a classic ESP32 a
 | LTR390 VIN / GND | → | 3V3 / GND |
 | LTR390 SDA / SCL | → | **GPIO 33 / 35** (same bus as the BME688) |
 
-**Probe divider (required on the S2).** The S2's ADC tops out around 2.5 V (a classic
+**Probe divider: not needed after all.** Measured on 2026-11-07: bone-dry potting mix reads 3754 and fully-watered-and-drained mix ~3280, so in-soil readings never approach the S2's ~2.5 V ADC ceiling; only a probe in open air clips at 4095. A divider would halve the usable span. Kept for reference:
+
+~~**Probe divider (required on the S2).**~~ The S2's ADC tops out around 2.5 V (a classic
 ESP32 reads to ~3.1 V), and a dry capacitive probe on 3.3 V outputs more than that, so
 without a divider "dry" clips at 4095 and you can't see the soil drying out. Two equal
 resistors (10k–100k) halve the signal:
