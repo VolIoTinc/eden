@@ -86,6 +86,11 @@ install -m 644 -o grafana -g grafana \
 systemctl enable grafana-server >/dev/null
 
 say "edend"
+if [ ! -d "$REPO_DIR/edend" ]; then
+    echo "  (edend/ not in repo yet — skipping; re-run install.sh once it exists)"
+    SKIP_EDEND=1
+fi
+if [ -z "${SKIP_EDEND:-}" ]; then
 if [ ! -d /opt/edend/venv ]; then
     python3 -m venv /opt/edend/venv
 fi
@@ -99,6 +104,7 @@ fi
 if [ ! -f /etc/eden/plants.yaml ]; then
     install -m 640 -o edend -g edend "$REPO_DIR/edend/edend/plants.yaml.example" /etc/eden/plants.yaml
 fi
+fi  # SKIP_EDEND
 
 say "db-size check"
 install -m 755 "$REPO_DIR/pi/db-size-check/check-db-size.sh" /opt/eden/check-db-size.sh
