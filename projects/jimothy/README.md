@@ -24,6 +24,8 @@ and salty water. So Jimothy gets a full environment profile, not just a moisture
 | 2026-11-07 | Probe #2 installed in soil (no divider yet): dry_raw 4095 (clipped), wet_raw 1478. Probe #1 wet 1346, spare. Both clip dry on the S2 ADC *in air only*. |
 | 2026-11-07 | First watering (soaked in). Raw 2680 at watering → 3296 within 20 min, then flat ~3280 for 1.5 h = **field capacity**. Log: `data/2026-11-07-first-watering.csv`. IAQ 50→68 and eCO2 500→581 within minutes of watering (wet mix off-gassing). RH fell to 39.6 % by midnight. |
 | 2026-11-11 | 00:39 watered ~200 mL (shy of a cup). Finger test: top dry. Probe 3536 (21 %) just before → 1862 during. Readings in Serenity `~/eden-logs/2026-11-11-watering.log`. IAQ 50→58 on watering. Lesson: in this mix the top goes finger-dry around raw ~3500; a 3-day cycle at 20–26 °C. |
+| 2026-11-11 | Drain-back after the 200 mL: raw 1986 at +5 min, 2001 at +15, 2023 at +35, 2044 at +75 min (≈ 78 %) and still creeping up ~0.5 raw/min. Far wetter than the 2026-11-07 "field capacity" of 3280, so that number was a mostly-drained reading, not a plateau; the probe zone holds water for hours. Re-derive field capacity from tomorrow's curve in Grafana. |
+| 2026-11-11 | edend 0.1.0 live on Serenity: every topic → VictoriaMetrics (21 `eden_*` series within 20 s), node presence with 2 min debounce, own LWT. Grafana dashboard now fills (soil, air, light, node health). ntfy alerts are log-only until ntfy users exist. |
 | 2026-11-10 | Eden stack installed on Serenity (mosquitto, VictoriaMetrics, Grafana, ntfy). fw 0.2.0 flashed over USB: WiFi up in 2 s (rssi −35), MQTT publishing per contract, `jimothy.local` up, cmd round-trip + dedupe verified, first OTA (→ 0.2.1) succeeded. Soil 3333 (29 %), 20.0 °C / 54 % RH. Node now runs off the cable. |
 | 2026-11-09 | Sensors + S2 moved into a printed rim saddle. Wiring verified. Soil 3394 (two days of dry-down). BME688 reads 26.0 °C vs 21.5 °C Saturday — suspect board heat in the saddle, under review. |
 
@@ -32,12 +34,13 @@ normal. Don't respond by watering more.
 
 ## Phases
 
-- [ ] **1. Moisture probe:** wire, capture dry + wet, re-seat in Jimothy's soil
-- [ ] **2. BME688 + LTR390:** wire, confirm PTH + lux/UV, let BSEC2 IAQ calibrate (acc → 3)
+- [x] **1. Moisture probe:** wire, capture dry + wet, re-seat in Jimothy's soil (2026-11-07)
+- [x] **2. BME688 + LTR390:** wire, confirm PTH + lux/UV (2026-11-07); BSEC2 IAQ accuracy still climbing (acc 1 on 11-11)
 - [ ] **3. Watering:** peristaltic pump on the Eden dose contract; thresholds from observed data
 - [ ] **4. Camera:** Pi Zero snapshots → storage
 - [x] **5. Network:** WiFi + MQTT per `docs/mqtt-contract.md` + OTA + `jimothy.local` (fw 0.2.x, 2026-11-10)
-- [ ] **6. edend:** MQTT → VictoriaMetrics ingest so the Grafana dashboard fills; then watering policy + ntfy alerts
+- [x] **6a. edend ingest:** MQTT → VictoriaMetrics, node presence, Grafana dashboard filling (edend 0.1.0, 2026-11-11)
+- [ ] **6b. edend alerts + policy:** create ntfy users (`pi/install.sh` prints the commands) so offline/VM alerts reach the phone; watering policy once the pump exists
 - [ ] **7. Data:** photo/metadata storage (see discussion doc)
 - [ ] TODO (parked by Andy, 2026-11-10): camera (Pi Zero), pump; moisture-% remap to soil terms once a dry-down has been watched
 

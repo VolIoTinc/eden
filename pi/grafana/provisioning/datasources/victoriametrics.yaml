@@ -1,5 +1,13 @@
 apiVersion: 1
 
+# Dashboards reference this datasource by uid. Grafana can't change the uid of an
+# already-provisioned datasource in place ("data source not found" on start), so it is
+# deleted by name and recreated with the fixed uid on every start. Provisioned
+# datasources hold no user state, so this is free.
+deleteDatasources:
+  - name: VictoriaMetrics
+    orgId: 1
+
 datasources:
   - name: VictoriaMetrics
     uid: victoriametrics
