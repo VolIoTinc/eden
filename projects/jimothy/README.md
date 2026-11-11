@@ -23,6 +23,7 @@ and salty water. So Jimothy gets a full environment profile, not just a moisture
 | 2026-11-07 | S2 Mini + BME688 + LTR390 + probe soldered and verified. Probe #1 wet_raw = 1346 (pre-divider). Room 21.5 °C / 46 % RH. |
 | 2026-11-07 | Probe #2 installed in soil (no divider yet): dry_raw 4095 (clipped), wet_raw 1478. Probe #1 wet 1346, spare. Both clip dry on the S2 ADC *in air only*. |
 | 2026-11-07 | First watering (soaked in). Raw 2680 at watering → 3296 within 20 min, then flat ~3280 for 1.5 h = **field capacity**. Log: `data/2026-11-07-first-watering.csv`. IAQ 50→68 and eCO2 500→581 within minutes of watering (wet mix off-gassing). RH fell to 39.6 % by midnight. |
+| 2026-11-10 | Eden stack installed on Serenity (mosquitto, VictoriaMetrics, Grafana, ntfy). fw 0.2.0 flashed over USB: WiFi up in 2 s (rssi −35), MQTT publishing per contract, `jimothy.local` up, cmd round-trip + dedupe verified, first OTA (→ 0.2.1) succeeded. Soil 3333 (29 %), 20.0 °C / 54 % RH. Node now runs off the cable. |
 | 2026-11-09 | Sensors + S2 moved into a printed rim saddle. Wiring verified. Soil 3394 (two days of dry-down). BME688 reads 26.0 °C vs 21.5 °C Saturday — suspect board heat in the saddle, under review. |
 
 Expect some transplant sulk (droop, a dropped leaf) for 1–3 weeks after repotting. That's
@@ -34,8 +35,10 @@ normal. Don't respond by watering more.
 - [ ] **2. BME688 + LTR390:** wire, confirm PTH + lux/UV, let BSEC2 IAQ calibrate (acc → 3)
 - [ ] **3. Watering:** peristaltic pump on the Eden dose contract; thresholds from observed data
 - [ ] **4. Camera:** Pi Zero snapshots → storage
-- [ ] **5. Data:** decide storage (see discussion doc), then move Jimothy onto the shared
-      Eden node firmware + MQTT
+- [x] **5. Network:** WiFi + MQTT per `docs/mqtt-contract.md` + OTA + `jimothy.local` (fw 0.2.x, 2026-11-10)
+- [ ] **6. edend:** MQTT → VictoriaMetrics ingest so the Grafana dashboard fills; then watering policy + ntfy alerts
+- [ ] **7. Data:** photo/metadata storage (see discussion doc)
+- [ ] TODO (parked by Andy, 2026-11-10): camera (Pi Zero), pump; moisture-% remap to soil terms once a dry-down has been watched
 
 ---
 
@@ -90,12 +93,35 @@ S2 notes:
   Qwiic if your breakouts have the connectors.
 - Give the BME688 3.3 V only. Most breakouts have a regulator, but 3V3 is always safe.
 
-## Phase 1: moisture calibration
+## Firmware (0.2.x): flashing, config, OTA
 
 ```sh
 cd projects/jimothy/firmware
-pio run -t upload && pio device monitor
+cp data/config.example.json data/config.json     # then fill in wifi + mqtt + ota passwords
+pio run -t upload && pio run -t uploadfs          # first time only, over USB
+pio device monitor
 ```
+
+- `data/config.json` is gitignored. MQTT node password: `.secrets/mqtt-eden-node.password`
+  (created when the broker users were made); OTA password: `.secrets/ota.password`.
+- **OTA after that**: `export EDEN_OTA_PW="$(cat .secrets/ota.password)"; pio run -e ota -t upload`
+  (`pio run -e ota -t uploadfs` for a config change). PlatformIO's espota prints the
+  password in its debug log; don't paste that output anywhere.
+- OTA safety: a new image is only marked good after it reconnects to MQTT; otherwise the
+  bootloader rolls back to the previous slot on the next reset.
+- **Status page**: `http://jimothy.local` (same WiFi) — live values, `/api/state` JSON,
+  `/api/config` (secrets masked), dry/wet capture buttons, `POST /api/reboot`.
+- MQTT: `eden/jimothy/status` (retained, LWT), `sensor/{moisture,temp_c,rh_pct,pressure_hpa,
+  iaq,siaq,eco2_ppm,bvoc_ppm,lux,uvi}`, `telemetry` every 60 s, `cmd/system`
+  (`announce`/`reload`/`reboot`) with `accepted → done` acks and id dedupe.
+- Network: the node joins the Nighthawk WiFi (192.168.1.x) and reaches the broker at
+  10.0.0.1 through the Nighthawk's NAT. Serenity cannot initiate connections to the node;
+  everything is node-initiated, including OTA pulls later.
+- Without a `config.json` the firmware still runs the sensors and serial keys, offline.
+
+## Phase 1: moisture calibration
+
+With the USB monitor (`pio device monitor`) or the web page's capture buttons:
 
 The monitor prints `moisture raw=…` every 5 s. Serial keys: `d` dry, `w` wet, `p` print
 calibration, `i` I2C scan + sensor status, `r` reboot (re-shows boot messages), `x` wipe
