@@ -23,7 +23,7 @@ ensure_user() {
 
 say "apt packages"
 apt-get update -qq
-apt-get install -y -qq mosquitto mosquitto-clients curl python3-venv python3-pip apt-transport-https software-properties-common
+apt-get install -y -qq mosquitto mosquitto-clients curl gnupg python3-venv python3-pip
 
 say "users + directories"
 ensure_user victoriametrics
