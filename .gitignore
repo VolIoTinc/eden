@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 .venv/
+projects/*/firmware/data/config.json
+firmware/data/config.json
+*.secret
+.secrets/
