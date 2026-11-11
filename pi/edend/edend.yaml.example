@@ -13,7 +13,7 @@ victoriametrics:
   spool_max_mb: 64
 
 ntfy:
-  url: http://127.0.0.1:8090
+  url: http://<tailscale-ip>:8090   # ntfy binds to the Tailscale IP only
   topic: eden_alerts
   username: eden
   password: CHANGE_ME

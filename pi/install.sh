@@ -8,6 +8,10 @@ VM_VERSION="${VM_VERSION:-1.115.0}"
 NTFY_VERSION="${NTFY_VERSION:-2.14.0}"
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 ARCH=arm64
+# Grafana and ntfy bind to the Tailscale IP only: the Pi has a public LTE interface and
+# we don't touch iptables (Serenity owns it), so binding is the firewall.
+TS_IP="${TS_IP:-$(tailscale ip -4 2>/dev/null || true)}"
+[ -n "$TS_IP" ] || { echo "cannot determine Tailscale IP (tailscale ip -4); set TS_IP=..."; exit 1; }
 
 [ "$(id -u)" -eq 0 ] || { echo "run as root: sudo $0"; exit 1; }
 
@@ -61,7 +65,7 @@ if [ ! -x /opt/ntfy/ntfy ] || ! /opt/ntfy/ntfy --version 2>/dev/null | grep -q "
     install -m 755 "/tmp/ntfy_${NTFY_VERSION}_linux_${ARCH}/ntfy" /opt/ntfy/ntfy
     rm -rf /tmp/ntfy.tar.gz "/tmp/ntfy_${NTFY_VERSION}_linux_${ARCH}"
 fi
-install -m 644 "$REPO_DIR/pi/ntfy/server.yml" /etc/ntfy/server.yml
+sed "s/__TS_IP__/$TS_IP/g" "$REPO_DIR/pi/ntfy/server.yml" > /etc/ntfy/server.yml && chmod 644 /etc/ntfy/server.yml
 install -m 644 "$REPO_DIR/pi/ntfy/ntfy.service" /etc/systemd/system/ntfy.service
 
 say "grafana"
@@ -83,6 +87,9 @@ install -d -o grafana -g grafana /var/lib/grafana/dashboards/eden
 install -m 644 -o grafana -g grafana \
     "$REPO_DIR/pi/grafana/dashboards/eden-overview.json" \
     /var/lib/grafana/dashboards/eden/eden-overview.json
+install -d /etc/systemd/system/grafana-server.service.d
+sed "s/__TS_IP__/$TS_IP/g" "$REPO_DIR/pi/grafana/grafana-server.override.conf" \
+    > /etc/systemd/system/grafana-server.service.d/eden.conf
 systemctl enable grafana-server >/dev/null
 
 say "edend"
@@ -140,7 +147,8 @@ if [ "${NEED_EDEND_CONFIG:-0}" = 1 ]; then
     echo "  systemctl enable --now edend"
     echo
 fi
-echo "  # Phone: ntfy app -> add server http://<pi-tailscale-ip>:8090, user andy,"
+echo "  # Grafana: http://$TS_IP:3000  (admin/admin on first login — change it)"
+echo "  # Phone: ntfy app -> add server http://$TS_IP:8090, user andy,"
 echo "  #        subscribe to topic 'eden_alerts'"
 echo
 echo "  # Smoke tests:"
