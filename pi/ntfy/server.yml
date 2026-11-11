@@ -6,6 +6,7 @@
 # LAN/Tailscale-only. Do NOT expose 8090 on wwan0.
 # Tailscale IP only — never the LTE WAN. __TS_IP__ is filled in by pi/install.sh.
 listen-http: "__TS_IP__:8090"
+base-url: "http://__TS_IP__:8090"   # required once attachment-cache-dir is set
 
 cache-file: /var/cache/ntfy/cache.db
 cache-duration: "72h"
