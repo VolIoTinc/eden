@@ -83,12 +83,15 @@ class VMWriter:
                 await self._replay()
 
     def _set_up(self, ok: bool) -> None:
-        if ok != self.up:
-            if self.up is not None or not ok:
-                (log.info if ok else log.warning)("VictoriaMetrics %s", "reachable" if ok else "UNREACHABLE; spooling")
-            self.up = ok
-            if self.on_state:
-                self.on_state(ok)
+        if ok == self.up:
+            return
+        first = self.up is None
+        self.up = ok
+        if first and ok:
+            return  # normal startup: nothing to announce
+        (log.info if ok else log.warning)("VictoriaMetrics %s", "reachable" if ok else "UNREACHABLE; spooling")
+        if self.on_state:
+            self.on_state(ok)
 
     # -- spool ---------------------------------------------------------------
     def _spool_files(self) -> list[Path]:

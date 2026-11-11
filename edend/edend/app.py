@@ -181,6 +181,7 @@ class App:
 def cli() -> None:
     logging.basicConfig(level=os.environ.get("EDEND_LOG", "INFO").upper(),
                         format="%(asctime)s %(levelname).1s %(name)s %(message)s")
+    logging.getLogger("httpx").setLevel(logging.WARNING)  # one line per flush otherwise
     cfg = load_config()
     log.info("edend %s starting; mqtt=%s:%d vm=%s ntfy=%s", __version__, cfg.mqtt.host, cfg.mqtt.port,
              cfg.victoriametrics.write_url, "on" if cfg.ntfy.enabled else "log-only")

@@ -32,12 +32,14 @@ def run(coro):
 def test_flush_posts_buffer(tmp_path):
     async def go():
         vm = FakeVM()
-        w = VMWriter(vm.post, spool_dir=tmp_path)
+        states = []
+        w = VMWriter(vm.post, spool_dir=tmp_path, on_state=states.append)
         w.add(Sample("a", 1, 1, {}))
         w.add(Sample("b", 2, 2, {}))
         await w.flush()
         assert vm.bodies == ["a 1 1000\nb 2 2000\n"]
         assert w.up is True and w.lines_written == 2
+        assert states == []  # healthy startup is not an event
         await w.flush()  # empty buffer: no post
         assert len(vm.bodies) == 1
     run(go())
