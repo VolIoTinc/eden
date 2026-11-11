@@ -8,6 +8,8 @@ User=edend
 Group=edend
 ExecStart=/opt/edend/venv/bin/python -m edend
 Environment=EDEND_CONFIG=/etc/eden/edend.yaml
+# MQTT_EDEND_PASSWORD=... (created by hand at install time; never in the repo)
+EnvironmentFile=-/etc/eden/mqtt-edend.env
 Restart=on-failure
 RestartSec=10
 # If edend crash-loops, systemd gives up after 5 tries in 10 min; the loss of its

@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edend"
+version = "0.1.0"
+description = "Eden orchestrator daemon: MQTT ingest to VictoriaMetrics, node presence, alerts"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "aiomqtt>=2.0,<3",
+    "httpx>=0.27",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+edend = "edend.app:cli"
+
+[tool.setuptools.packages.find]
+include = ["edend*"]
+
+[tool.setuptools.package-data]
+edend = ["plants.yaml.example"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

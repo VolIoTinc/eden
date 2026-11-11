@@ -20,7 +20,7 @@
 
 | Decision | Choice | Why |
 |---|---|---|
-| TSDB | VictoriaMetrics single-node | Single static ARM64 binary, ~50–100 MB RSS; accepts InfluxDB line protocol on `/write`; PromQL for Grafana; `-retentionPeriod` + `-memory.allowedBytes` caps. InfluxDB 2.x is 3–6× the RAM for nothing we need. |
+| TSDB | VictoriaMetrics single-node | Single static ARM64 binary, ~50–100 MB RSS; accepts Prometheus text import on `/api/v1/import/prometheus` (and Influx line protocol); PromQL for Grafana; `-retentionPeriod` + `-memory.allowedBytes` caps. InfluxDB 2.x is 3–6× the RAM for nothing we need. |
 | Deployment | Bare systemd | Docker rewrites iptables FORWARD chains → real risk to Serenity NAT. Every service is an apt package or static binary; `MemoryMax=` per unit. |
 | Firmware | One PlatformIO codebase, runtime JSON config | Node role = data, not code. Sensor-only vs pump/valve node is the same binary with a different `/config.json`. |
 | Control | Pi decides, node enforces | Watering policy, schedules, daily caps live in `edend`. Firmware independently enforces per-dose caps + hardware-timer watchdog, so a hung Pi or dropped WiFi can never flood a plant. |
@@ -29,7 +29,8 @@
 ## Data flow
 
 1. Node samples moisture (median-of-15, powered probe) → `eden/<node>/sensor/<name>` (QoS 0).
-2. `edend` ingests → batches → Influx line protocol → VM `/write` (flush 10 s / 500 lines;
+2. `edend` ingests → batches → Prometheus text lines (`eden_<sensor>{node=…}`, see
+   `edend/README.md`) → VM `/api/v1/import/prometheus` (flush 10 s / 500 lines;
    bounded disk spool if VM is down).
 3. Watering engine evaluates each reading against `plants.yaml` (threshold, min interval,
    quiet hours, daily cap) → publishes `cmd/pump/<idx>` with unique id + `max_ms`.

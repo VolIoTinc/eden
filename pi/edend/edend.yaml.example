@@ -1,12 +1,14 @@
-# edend config — install to /etc/eden/edend.yaml
+# edend config — install to /etc/eden/edend.yaml (mode 640, owner edend)
 mqtt:
-  host: 127.0.0.1
+  host: 10.0.0.1          # mosquitto listens on the LAN address only
   port: 1883
   username: edend
-  password: CHANGE_ME
+  password: CHANGE_ME     # or leave: MQTT_EDEND_PASSWORD from /etc/eden/mqtt-edend.env wins
 
 victoriametrics:
-  write_url: http://127.0.0.1:8428/write
+  # Prometheus text import (not Influx line protocol) so metric names are exactly
+  # what edend/ingest.py says: eden_<sensor>{node=...}, eden_node_online{node=...}, ...
+  write_url: http://127.0.0.1:8428/api/v1/import/prometheus
   flush_interval_s: 10
   flush_max_lines: 500
   spool_dir: /var/lib/edend/spool
@@ -15,11 +17,14 @@ victoriametrics:
 ntfy:
   url: http://<tailscale-ip>:8090   # ntfy binds to the Tailscale IP only
   topic: eden_alerts
-  username: eden
-  password: CHANGE_ME
+  # Credentials come from cred_file ("user:pass", same file db-size-check uses),
+  # or set username/password here. Until configured, alerts are log-only.
+  cred_file: /etc/eden/ntfy.cred
 
 plants_file: /etc/eden/plants.yaml
+presence_reemit_s: 60     # how often eden_node_online is re-written per node
 
 alerts:
   node_offline_debounce_s: 120
   dose_done_notify: false   # true = ping on every completed dose (chatty)
+  vm_down_notify: true

@@ -1,0 +1,18 @@
+# Plants known to edend — install to /etc/eden/plants.yaml
+#
+# Watering policy is not implemented yet (no pump nodes exist). For now this file
+# only names plants and which node/sensors belong to them, so alerts and dashboards
+# can use plant names. Fields marked (future) are read but ignored.
+
+plants:
+  jimothy:
+    species: avocado
+    node: jimothy
+    moisture_sensor: moisture        # eden/jimothy/sensor/moisture
+    pump: null                       # (future) {node: ..., idx: 0, port: null}
+    water:                           # (future) policy, Pi decides / node enforces
+      threshold_pct: 35
+      dose_ml: 200
+      min_interval_h: 48
+      daily_cap_ml: 400
+      quiet_hours: ["22:00", "07:00"]

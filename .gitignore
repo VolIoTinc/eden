@@ -6,3 +6,7 @@ projects/*/firmware/data/config.json
 firmware/data/config.json
 *.secret
 .secrets/
+edend/*.egg-info/
+edend/build/
+edend/dist/
+.pytest_cache/
