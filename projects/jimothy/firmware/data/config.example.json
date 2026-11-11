@@ -1,0 +1,21 @@
+{
+  "node": "jimothy",
+  "wifi": {
+    "ssid": "YOUR_2.4GHZ_SSID",
+    "password": "YOUR_WIFI_PASSWORD"
+  },
+  "mqtt": {
+    "host": "10.0.0.1",
+    "port": 1883,
+    "username": "eden-node",
+    "password": "contents of .secrets/mqtt-eden-node.password"
+  },
+  "ota": {
+    "password": "pick a long random string; export EDEN_OTA_PW=<same> on the dev box"
+  },
+  "sensors": {
+    "moisture": { "dry_raw": 4095, "wet_raw": 1478, "interval_s": 60 },
+    "env": { "interval_s": 60 },
+    "light": { "interval_s": 60 }
+  }
+}
