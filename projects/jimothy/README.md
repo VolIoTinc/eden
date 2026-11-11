@@ -23,6 +23,7 @@ and salty water. So Jimothy gets a full environment profile, not just a moisture
 | 2026-11-07 | S2 Mini + BME688 + LTR390 + probe soldered and verified. Probe #1 wet_raw = 1346 (pre-divider). Room 21.5 °C / 46 % RH. |
 | 2026-11-07 | Probe #2 installed in soil (no divider yet): dry_raw 4095 (clipped), wet_raw 1478. Probe #1 wet 1346, spare. Both clip dry on the S2 ADC *in air only*. |
 | 2026-11-07 | First watering (soaked in). Raw 2680 at watering → 3296 within 20 min, then flat ~3280 for 1.5 h = **field capacity**. Log: `data/2026-11-07-first-watering.csv`. IAQ 50→68 and eCO2 500→581 within minutes of watering (wet mix off-gassing). RH fell to 39.6 % by midnight. |
+| 2026-11-11 | 00:39 watered ~200 mL (shy of a cup). Finger test: top dry. Probe 3536 (21 %) just before → 1862 during. Readings in Serenity `~/eden-logs/2026-11-11-watering.log`. IAQ 50→58 on watering. Lesson: in this mix the top goes finger-dry around raw ~3500; a 3-day cycle at 20–26 °C. |
 | 2026-11-10 | Eden stack installed on Serenity (mosquitto, VictoriaMetrics, Grafana, ntfy). fw 0.2.0 flashed over USB: WiFi up in 2 s (rssi −35), MQTT publishing per contract, `jimothy.local` up, cmd round-trip + dedupe verified, first OTA (→ 0.2.1) succeeded. Soil 3333 (29 %), 20.0 °C / 54 % RH. Node now runs off the cable. |
 | 2026-11-09 | Sensors + S2 moved into a printed rim saddle. Wiring verified. Soil 3394 (two days of dry-down). BME688 reads 26.0 °C vs 21.5 °C Saturday — suspect board heat in the saddle, under review. |
 
