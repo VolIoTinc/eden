@@ -36,13 +36,25 @@ normal. Don't respond by watering more.
 
 - [x] **1. Moisture probe:** wire, capture dry + wet, re-seat in Jimothy's soil (2026-11-07)
 - [x] **2. BME688 + LTR390:** wire, confirm PTH + lux/UV (2026-11-07); BSEC2 IAQ accuracy still climbing (acc 1 on 11-11)
-- [ ] **3. Watering:** peristaltic pump on the Eden dose contract; thresholds from observed data
-- [ ] **4. Camera:** Pi Zero snapshots → storage
+- [ ] **3. Watering:** single peristaltic pump on the Eden dose contract (S2 firmware + hardware-timer
+      watchdog, flow calibration with `tools/calibrate-pump.py`, then edend policy after a full dry-down
+      has been watched). Later: one pump + a water-selecting valve per plant (`docs/valve-interface.md`;
+      mind the post-valve line that drips into the last port, and per-port priming volume).
+- [ ] **4. Camera:** Pi Zero snapshots 2×/day (more if useful) for plant health. Same LED light for every
+      shot, fixed scale marker in frame. Prior work: Serenity `~/eden-pi-cam`, `~/github/eden-vision`.
 - [x] **5. Network:** WiFi + MQTT per `docs/mqtt-contract.md` + OTA + `jimothy.local` (fw 0.2.x, 2026-11-10)
 - [x] **6a. edend ingest:** MQTT → VictoriaMetrics, node presence, Grafana dashboard filling (edend 0.1.0, 2026-11-11)
 - [ ] **6b. edend alerts + policy:** create ntfy users (`pi/install.sh` prints the commands) so offline/VM alerts reach the phone; watering policy once the pump exists
-- [ ] **7. Data:** photo/metadata storage (see discussion doc)
-- [ ] TODO (parked by Andy, 2026-11-10): camera (Pi Zero), pump; moisture-% remap to soil terms once a dry-down has been watched
+- [ ] **7. Data:** photo/metadata storage (see discussion doc); nightly VictoriaMetrics snapshot off the SD card
+- [ ] **8. NFC tags:** NTAG215 sticker per plant → URL to that plant's readings (Grafana with `var-node` preset,
+      or a phone-sized per-plant page served by edend). Same page gets a "log an event" button (hand-watered,
+      fertilized, repotted, pruned, moved) that writes a Grafana annotation.
+- [ ] **Safety sensors before auto-watering:** reservoir level (float switch or load cell; refuse to dose on
+      empty, alert on low) and a saucer/overflow probe.
+- [ ] **Light budget:** daily light integral from the LTR390 in edend; decide on a scheduled grow light.
+- [ ] **Care:** fertilizer schedule/reminders (later a nutrient channel); probe recalibration cadence + spare.
+- [ ] Parked by Andy (2026-11-10): moisture-% remap to soil terms once a dry-down has been watched.
+- [ ] Open: BME688 in-saddle temperature reads high; pull-OTA + fleet tooling (matters at node #2).
 
 ---
 
