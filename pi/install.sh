@@ -36,13 +36,15 @@ install -d /etc/eden /opt/eden
 
 say "mosquitto"
 install -m 644 "$REPO_DIR/pi/mosquitto/eden.conf" /etc/mosquitto/conf.d/eden.conf
-install -m 640 -g mosquitto "$REPO_DIR/pi/mosquitto/eden.acl" /etc/mosquitto/eden.acl
+install -m 640 -o mosquitto -g mosquitto "$REPO_DIR/pi/mosquitto/eden.acl" /etc/mosquitto/eden.acl
 if [ ! -f /etc/mosquitto/eden.passwd ]; then
     touch /etc/mosquitto/eden.passwd
-    chmod 640 /etc/mosquitto/eden.passwd
-    chgrp mosquitto /etc/mosquitto/eden.passwd
     NEED_MQTT_PASSWORDS=1
 fi
+chown mosquitto:mosquitto /etc/mosquitto/eden.passwd && chmod 640 /etc/mosquitto/eden.passwd
+# Wait for the LAN address and keep retrying: the listener binds 10.0.0.1 only.
+install -d /etc/systemd/system/mosquitto.service.d
+install -m 644 "$REPO_DIR/pi/mosquitto/mosquitto.service.override.conf" /etc/systemd/system/mosquitto.service.d/eden.conf
 systemctl enable mosquitto >/dev/null
 
 say "VictoriaMetrics ${VM_VERSION}"

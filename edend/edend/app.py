@@ -100,6 +100,8 @@ class App:
     async def mqtt_loop(self) -> None:
         m = self.cfg.mqtt
         backoff = 2.0
+        down_since: float | None = None   # monotonic time of the first failed connect
+        down_alerted = False
         while not self.stop.is_set():
             try:
                 will = aiomqtt.Will(STATUS_TOPIC, json.dumps({"online": False}), qos=1, retain=True)
@@ -107,6 +109,11 @@ class App:
                                           identifier=m.client_id, will=will, keepalive=30) as client:
                     log.info("MQTT connected to %s:%d as %s", m.host, m.port, m.username)
                     backoff = 2.0
+                    if down_alerted:
+                        mins = int((time.monotonic() - (down_since or 0)) // 60)
+                        self._alert_q.put_nowait(("MQTT broker back", f"after {mins} min; node data resumes",
+                                                  "default", ("white_check_mark",)))
+                    down_since, down_alerted = None, False
                     await client.publish(STATUS_TOPIC, json.dumps({
                         "online": True, "fw": __version__, "host": socket.gethostname()}), qos=1, retain=True)
                     for t in SUBSCRIPTIONS:
@@ -126,6 +133,13 @@ class App:
                 if self.stop.is_set():
                     return
                 log.warning("MQTT: %s; retry in %.0fs", e, backoff)
+                now = time.monotonic()
+                down_since = down_since or now
+                if not down_alerted and now - down_since >= self.cfg.alerts.node_offline_debounce_s:
+                    down_alerted = True
+                    self._alert_q.put_nowait(("MQTT broker unreachable",
+                                              f"{m.host}:{m.port}: {e}. No node data is being recorded.",
+                                              "high", ("rotating_light",)))
                 await asyncio.sleep(backoff)
                 backoff = min(backoff * 2, 60)
 
